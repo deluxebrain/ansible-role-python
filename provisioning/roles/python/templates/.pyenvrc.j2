@@ -1,0 +1,27 @@
+# Add pyenv into path
+export PYENV_ROOT="{{ pyenv_root }}"
+export PATH="${PYENV_ROOT}/bin:${PATH}"
+
+# Resolve $HOME/.local/bin/pip ahead of /usr/bin/pip
+# Resolve packages installed using pip --user
+export PATH="$HOME/.local/bin:$PATH"
+
+# Disable prompt changing
+export PYENV_VIRTUALENV_DISABLE_PROMPT=1
+
+# Configure Pipenv to integrate with PyEnv
+export PIPENV_PYTHON="$PYENV_ROOT/shims/python"
+
+# Set Python to use UTF-8 encoding for stdout/stdin/stderr
+export PYTHONIOENCODING="UTF-8"
+
+# Initialise pyenv if installed
+if command -v pyenv >/dev/null 2>&1 ; then
+    eval "$(pyenv init -)"
+    . "$PYENV_ROOT/completions/pyenv.bash"
+fi
+
+# Initialise pyenv-virtualenv if installed
+if [ -d "${PYENV_ROOT}/plugins/pyenv-virtualenv" ] ; then
+    eval "$(pyenv virtualenv-init -)"
+fi

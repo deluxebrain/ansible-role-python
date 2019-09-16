@@ -1,0 +1,26 @@
+---
+- name: Create .pyenvrc file
+  template:
+    src: .pyenvrc.j2
+    dest: "{{ ansible_env.HOME }}/.pyenvrc"
+    mode: "0644"
+
+- name: Check global python
+  shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global"
+  args:
+    executable: /bin/bash
+  register: check_global_python
+  changed_when: yes
+
+- name: Set global python
+  shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global system"
+  args:
+    executable: /bin/bash
+  when: check_global_python.stdout != "sytem"
+
+- name: Install Python interpreters
+  shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv install {{ item }}"
+  args:
+    executable: /bin/bash
+    creates: "{{ pyenv_root }}/versions/{{ item }}/bin/python"
+  with_items: "{{ python_versions }}"

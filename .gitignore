@@ -1,0 +1,11 @@
+# IDE's
+.vscode
+
+# Vagrant
+boxes/*
+/.vagrant
+*.log
+.vagrantuser
+
+# Ansible
+*.retry
