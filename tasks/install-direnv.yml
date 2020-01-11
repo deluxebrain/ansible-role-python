@@ -1,0 +1,15 @@
+---
+- name: Install direnv
+  become: yes
+  package:
+    name: direnv
+    state: present
+  register: result
+  retries: 3
+  until: result is succeeded
+
+- name: Create direnvrc file
+  template:
+    src: direnvrc.j2
+    dest: "{{ ansible_env.HOME }}/.direnvrc"
+    mode: 0644

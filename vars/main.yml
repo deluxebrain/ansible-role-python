@@ -1,0 +1,12 @@
+---
+pyenv_repo: https://github.com/pyenv/pyenv.git
+
+pyenvvirtualenv_repo: https://github.com/pyenv/pyenv-virtualenv.git
+
+pyenv_reference: >-
+  {{ (pyenv_version == 'latest') | ternary('HEAD', 'v' + pyenv_version) }}
+
+pyenvvirtualenv_reference: "{{ (pyenvvirtualenv_version == 'latest') | \
+  ternary('HEAD', 'v' + pyenvvirtualenv_version) }}"
+
+default_pip_packages: []

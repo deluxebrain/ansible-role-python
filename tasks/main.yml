@@ -21,21 +21,14 @@
   until: result is succeeded
   with_items: "{{ system_dependencies }}"
 
-- name: Install system python
-  become: yes
-  package:
-    name: "{{ item }}"
-    state: present
-  register: result
-  retries: 3
-  until: result is succeeded
-  with_items: "{{ system_python_packages }}"
+- include_tasks: install-direnv.yml
+  when: install_direnv | bool
+
+- include_tasks: install-python.yml
 
 - include_tasks: install-pyenv.yml
 
 - include_tasks: configure-pyenv.yml
-
-- include_tasks: install-packages.yml
 
 - include_tasks: configure-shell.yml
   when: init_shell | bool

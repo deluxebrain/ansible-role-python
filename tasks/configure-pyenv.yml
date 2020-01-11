@@ -1,22 +1,29 @@
 ---
 - name: Create .pyenvrc file
   template:
-    src: .pyenvrc.j2
+    src: pyenvrc.j2
     dest: "{{ ansible_env.HOME }}/.pyenvrc"
-    mode: "0644"
+    mode: 0644
+
+- name: Create .condarc file
+  template:
+    src: condarc.j2
+    dest: "{{ ansible_env.HOME }}/.condarc"
+    mode: 0644
+  when: python_versions | select('search', 'conda') | list
 
 - name: Check global python
   shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global"
   args:
     executable: /bin/bash
   register: check_global_python
-  changed_when: yes
+  changed_when: False
 
 - name: Set global python
   shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global system"
   args:
     executable: /bin/bash
-  when: check_global_python.stdout != "sytem"
+  when: check_global_python.stdout != "system"
 
 - name: Install Python interpreters
   shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv install {{ item }}"

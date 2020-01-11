@@ -1,0 +1,23 @@
+---
+language: python
+python: 
+  - "2.7"
+  - "3.7"
+services:
+  - docker
+
+env:
+  matrix:
+    - MOLECULE_DISTRO: "ubuntu:18.04"
+    - MOLECULE_DISTRO: "ubuntu:19.04"
+
+install:
+  pip install molecule docker jmespath
+
+script:
+  - molecule --version
+  - ansible --version
+  - molecule test
+
+notifications:
+  webhooks: https://galaxy.ansible.com/api/v1/notifications/

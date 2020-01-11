@@ -1,37 +1,62 @@
-include config.env
+.DEFAULT_GOAL := lint
+.PHONY: venv install lint converge run connect run-all test test-all clean
+VENV_NAME := .venv
+VENV := $(VENV_NAME)/.timestamp
+VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
+SITE_PACKAGES := $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
+	pip3 show pip | grep ^Location | cut -d':' -f2)
+DISTROS := ubuntu_18.04 \
+	ubuntu_19.04
+TEST_TARGETS := $(addprefix test-,$(DISTROS))
+RUN_TARGETS := $(addprefix run-,$(DISTROS))
+RUN := .run_timestamp
 
-.DEFAULT_GOAL := help
+venv: $(VENV)
+$(VENV):
+	python3 -m venv $(VENV_NAME)
+	touch $@
 
-.PHONY: help
-help:
-	@grep -E '(^[a-zA-Z_-]+:.*?##.*$$)|(^##)' Makefile \
-		| awk 'BEGIN {FS = ":.*?## "}{printf "\033[32m%-30s\033[0m %s\n", $$1, $$2}' \
-		| sed -e 's/\[32m##/[33m/'
+install: venv $(SITE_PACKAGES)
+$(SITE_PACKAGES): requirements.txt
+	$(VENV_ACTIVATE); \
+	pip3 install -r requirements.txt
 
-## Vagrant targets
+lint:
+	yamllint .
+	ansible-lint .
 
-.PHONY: provision
-provision: ## Re-run Vagrant ansible provisioners
-	@vagrant provision --provision-with ansible_local
+converge: install
+	$(VENV_ACTIVATE); \
+	molecule converge
 
-.PHONY: clean
-clean: ## Teardown working environment
-	@vagrant destroy --force
-	@vboxmanage list runningvms \
-	| grep $(APP_NAME) \
-	| awk '{ print $$2 }' \
-	| xargs -I vmid vboxmanage controlvm vmid poweroff
-	@vboxmanage list vms \
-	| grep $(APP_NAME) \
-	| awk '{ print $$2 }' \
-	| xargs -I vmid vboxmanage unregistervm vmid
+run: $(RUN)
+$(RUN):
+	$(VENV_ACTIVATE); \
+	molecule converge
+	touch $@
 
-## Python targets
+connect: run
+	$(VENV_ACTIVATE); \
+	molecule login
 
-.PHONY: install
-install: ## Install pipenv virtual environment
-	@pipenv install --dev --skip-lock --python="$(PYTHON_VERSION)"
+run-all: install clean $(RUN_TARGETS)
+$(RUN_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst run-,,$@))
+$(RUN_TARGETS):
+	$(VENV_ACTIVATE); \
+	molecule converge; \
+	molecule destroy
 
-.PHONY: uninstall
-uninstall: ## Uninstall pipenv virtual environment
-	@pipenv --rm
+test: install clean
+	$(VENV_ACTIVATE); \
+	molecule test
+
+test-all: install clean $(TEST_TARGETS)
+$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst test-,,$@))
+$(TEST_TARGETS):
+	$(VENV_ACTIVATE); \
+	molecule test
+
+clean: install
+	$(VENV_ACTIVATE); \
+	molecule destroy; \
+	rm -f $(RUN)

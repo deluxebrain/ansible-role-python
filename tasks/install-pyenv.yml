@@ -1,23 +1,17 @@
 ---
-- name: Find python3
-  shell: "dirname `which python3`"
-  register: python3_path
-
-- name: Link python to python3
-  become: yes
-  file:
-    src: "{{ python3_path.stdout }}/python3"
-    dest: "{{ python3_path.stdout }}/python"
-    state: link
-    owner: root
-    group: root
-    mode: "0755"
+- name: Debug pyenv version
+  debug:
+    msg: "Version of pyenv to install: {{ pyenv_reference }}"
 
 - name: Install pyenv
   git:
     repo: "{{ pyenv_repo }}"
     dest: "{{ pyenv_root }}"
     version: "{{ pyenv_reference }}"
+
+- name: Debug pyenv-virtualenv version
+  debug:
+    msg: "Version of pyenv-virtualenv to install: {{ pyenvvirtualenv_reference }}"
 
 - name: Install pyenv-virtualenv
   git:
