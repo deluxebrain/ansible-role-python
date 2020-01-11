@@ -9,7 +9,14 @@
   until: result is succeeded
 
 - name: Create direnvrc file
-  template:
-    src: direnvrc.j2
+  copy:
+    content: ""
     dest: "{{ ansible_env.HOME }}/.direnvrc"
+    force: no
     mode: 0644
+
+- name: Populate direnvrc file
+  blockinfile:
+    dest: "{{ ansible_env.HOME }}/.direnvrc"
+    block: "{{ lookup('template', 'direnvrc.j2') }}"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK: {{ role_name }}"

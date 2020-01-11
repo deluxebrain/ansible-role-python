@@ -36,6 +36,17 @@ Individual variables can be set or overridden by setting them in a playbook for 
 - `link_python`: ( default: no )
   - Symlink Python2 to Python3
 
+### `link_python`
+
+`pyenv` will use the version of Python specified by the `pyenv global` command as the default Python version.
+When no explicit Python version is specified as part of this command, the default system Python version is used.
+
+`pyenv` resolves the system Python as the version that responds to the `python` command.
+This causes issues on systems where Python2 is not installed ( and hence the `python` command not available ), regardless of whether Python3 is installed.
+
+A workaround is to form a symlink from `usr/bin/python` to `usr/bin/python3` ( and similarly for pip ).
+This is performed by the role when `link_python` is set to true.
+
 ## Dependencies
 
 None.
