@@ -39,7 +39,7 @@
 - name: Load .direnv in .bashrc
   block:
     - name: Check whether direnv is loaded in the .bashrc file
-      command: "grep -Fq 'direnv hook bash'"
+      command: "grep -Fq 'direnv hook bash' {{ bashrc_path }}"
       register: check_bashrc
       ignore_errors: yes
       changed_when: no
