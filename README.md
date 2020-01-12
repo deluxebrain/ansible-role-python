@@ -33,19 +33,22 @@ Individual variables can be set or overridden by setting them in a playbook for 
   - Pip packages to install for the user into the system Python
 - `install_direnv`: ( default: yes )
   - Install `direnv` to help manage loading of virtual environments
-- `link_python`: ( default: no )
-  - Symlink Python2 to Python3
+- `global_python`: ( default: "" )
+  - Configure `pyenv` to use the specified version of Pythoon
+  - Currently only supports the empty string or "system"
 
-### `link_python`
+### `global_python`
 
 `pyenv` will use the version of Python specified by the `pyenv global` command as the default Python version.
 When no explicit Python version is specified as part of this command, the default system Python version is used.
 
 `pyenv` resolves the system Python as the version that responds to the `python` command.
-This causes issues on systems where Python2 is not installed ( and hence the `python` command not available ), regardless of whether Python3 is installed.
+This causes issues on systems where Python2 is not installed ( and hence the `python` command not available ),
+regardless of whether Python3 is installed.
 
-A workaround is to form a symlink from `usr/bin/python` to `usr/bin/python3` ( and similarly for pip ).
-This is performed by the role when `link_python` is set to true.
+Therefore `pyenv global` should only be set to use the system Python when Python2 is installed.
+In the case where Python3 is also installed, `pyenv` does not affect the `python3` command and hence
+this will be available globally using the `python3` command as per usual.
 
 ## Dependencies
 

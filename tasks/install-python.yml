@@ -9,44 +9,6 @@
   until: result is succeeded
   with_items: "{{ system_python_packages }}"
 
-- name: Link Python to Python3
-  block:
-    - name: Check python link
-      stat:
-        path: /usr/bin/python
-      register: python_path_stat
-
-    - name: Link python to python3
-      become: yes
-      file:
-        src: /usr/bin/python3
-        dest: /usr/bin/python
-        state: link
-        owner: root
-        group: root
-        mode: 0755
-      when: not python_path_stat.stat.exists
-  when: link_python | bool
-
-- name: Link pip to pip3
-  block:
-    - name: Check pip link
-      stat:
-        path: /usr/bin/pip
-      register: pip_path_stat
-
-    - name: Link pip to pip3
-      become: yes
-      file:
-        src: /usr/bin/pip3
-        dest: /usr/bin/pip
-        state: link
-        owner: root
-        group: root
-        mode: 0755
-      when: not pip_path_stat.stat.exists
-  when: link_python | bool
-
 - name: Form merged list of pip packages
   set_fact:
     merged_pip_packages: "{{ default_pip_packages | union(pip_packages) }}"

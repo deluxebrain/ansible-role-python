@@ -6,4 +6,4 @@ init_shell: yes
 python_versions: []
 pip_packages: []
 install_direnv: yes
-link_python: no
+global_python: ""

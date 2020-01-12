@@ -3,8 +3,8 @@
   hosts: all
   roles:
     - role: ansible-role-python
-      link_python: yes
       python_versions:
         - 3.8.1
       pip_packages:
         - azure-cli
+      global_python: system
