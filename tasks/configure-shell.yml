@@ -16,7 +16,7 @@
         bashrc_path: "{{ bashrc_path_stat.stat.lnk_source }}"
       when: bashrc_path_stat.stat.exists and bashrc_path_stat.stat.islnk
 
-- name: Load .pyenvrc in .bashrc
+- name: Load pyenv in .bashrc
   block:
     - name: Check whether pyenvrc is loaded in the .bashrc file
       command: "grep -Fq 'source $HOME/.pyenvrc' {{ bashrc_path }}"
@@ -25,7 +25,7 @@
       changed_when: no
       failed_when: no
 
-    - name: Load pyenvrc in .bashrc
+    - name: Add .pyenvrc to .bashrc
       blockinfile:
         dest: "{{ bashrc_path }}"
         marker: "# {mark} ANSIBLE MANAGED BLOCK: pyenv"
@@ -36,7 +36,7 @@
       when: check_bashrc.rc != 0
   when: bashrc_path_stat.stat.exists
 
-- name: Load .direnv in .bashrc
+- name: Load direnv in .bashrc
   block:
     - name: Check whether direnv is loaded in the .bashrc file
       command: "grep -Fq 'direnv hook bash' {{ bashrc_path }}"
@@ -45,7 +45,7 @@
       changed_when: no
       failed_when: no
 
-    - name: Load direnv in .bashrc
+    - name: Add direnv to .bashrc
       blockinfile:
         dest: "{{ bashrc_path }}"
         marker: "# {mark} ANSIBLE MANAGED BLOCK: direnv"
