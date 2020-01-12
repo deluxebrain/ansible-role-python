@@ -12,20 +12,20 @@
     mode: 0644
   when: python_versions | select('search', 'conda') | list
 
-- name: Set global Python
+- name: Set global Python version
   block:
     - name: Check global python
       shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global"
       args:
         executable: /bin/bash
-      register: check_global_python
+      register: global_python_version
       changed_when: False
 
-    - name: Set global python
+    - name: Set global python version
       shell: ". {{ ansible_env.HOME }}/.pyenvrc && pyenv global system"
       args:
         executable: /bin/bash
-      when: check_global_python.stdout | lower != "system"
+      when: global_python_version.stdout | lower != "system"
   when: global_python | lower == 'system'
 
 - name: Install Python interpreters

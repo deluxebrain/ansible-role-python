@@ -99,8 +99,7 @@ deactivate
 
 ### `pyenv`
 
-`pyenv` allows you to use multiple Python versions on the machine
-whilst maintaining the consistency of system Python.
+`pyenv` allows you to use multiple Python versions on your machine whilst maintaining the consistency of the system Python.
 
 Its use for using a specific Python version >= 3.3 is demonstrated in the following example:
 
