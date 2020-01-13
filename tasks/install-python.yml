@@ -1,25 +1,10 @@
 ---
-- name: Install system python
-  become: yes
-  package:
-    name: "{{ item }}"
-    state: present
-  register: result
-  retries: 3
-  until: result is succeeded
-  with_items: "{{ system_python_packages }}"
+- name: Check for python {{ item }}
+  stat:
+    path: "{{ pyenv.path }}/versions/{{ item }}"
+  register: python_exists
 
-- name: Form merged list of pip packages
-  set_fact:
-    merged_pip_packages: "{{ default_pip_packages | union(pip_packages) }}"
-
-- name: Show merged pip packages
-  debug:
-    var: merged_pip_packages
-
-- name: Install pip packages into system python
-  pip:
-    name: "{{ merged_pip_packages }}"
-    extra_args: --user
-    executable: pip3
-  when: merged_pip_packages | length > 0
+- name: Install python {{ item }}
+  raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv install {{ item }}"
+  notify: rehash
+  when: python_exists.stat is defined and not python_exists.stat.exists

@@ -21,23 +21,26 @@ Individual variables can be set or overridden by setting them in a playbook for 
 
 - `pyenv_version`: ( default: latest )
   - Pyenv version to install
-- `pyenv_root`: ( default: ~/.pyenv )
-  - Pyenv installation directory
 - `pyenvvirtualenv_version`: ( default: latest )
   - Pyenv-virtualenv version to install
-- `init_shell`: ( default: yes )
-  - Configure shell to load pyenv and pyenv-virtualenv
-- `python_versions`: ( default: [] )
-  - Optional array of Python versions to install via pyenv
-- `pip_packages`: ( default: [] )
-  - Pip packages to install for the user into the system Python
 - `install_direnv`: ( default: yes )
   - Install `direnv` to help manage loading of virtual environments
-- `global_python`: ( default: "" )
+- `python.global_version`: ( default: "" )
   - Configure `pyenv` to use the specified version of Pythoon
   - Currently only supports the empty string or "system"
+- `python.versions`: ( default: [] )
+  - List of Python versions to install
+- `plugins`: ( default: [] )
+  - List of plugins to install, specified as a list of:
+    - `name`: plugin name
+    - `repo`: plugin github repository
+    - `version`: plugin version, specify "latest" for HEAD
+- `pip_packages`: ( default: [] )
+  - Pip packages to install for the user into the system Python
+- `init_shell`: ( default: yes )
+  - Configure shell to load pyenv and pyenv-virtualenv
 
-### `global_python`
+### `python.global_python`
 
 `pyenv` will use the version of Python specified by the `pyenv global` command as the default Python version.
 When no explicit Python version is specified as part of this command, the default system Python version is used.

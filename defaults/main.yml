@@ -1,9 +1,10 @@
 ---
 pyenv_version: latest
-pyenv_root: "{{ ansible_env.HOME }}/.pyenv"
 pyenvvirtualenv_version: latest
-init_shell: yes
-python_versions: []
-pip_packages: []
 install_direnv: yes
-global_python: ""
+python:
+  global_version: ""
+  versions: []
+plugins: []
+pip_packages: []
+init_shell: yes

@@ -21,14 +21,40 @@
   until: result is succeeded
   with_items: "{{ system_dependencies }}"
 
-- include_tasks: install-direnv.yml
-  when: install_direnv | bool
-
-- include_tasks: install-python.yml
+- include_tasks: install-system-python.yml
 
 - include_tasks: install-pyenv.yml
 
-- include_tasks: configure-pyenv.yml
+- name: Install plugins
+  block:
+    - name: Form merged list of plugins
+      set_fact:
+        merged_plugins: "{{ default_plugins | union(plugins) }}"
+
+    - name: Install plugin {{ item.name }}
+      include: install-plugins.yml
+      with_items: "{{ merged_plugins }}"
+      when: merged_plugins | length > 0
+
+- name: Install python versions
+  include: install-python.yml
+  with_items:
+    - "{{ python.versions }}"
+
+- name: Set global python version
+  block:
+    - name: Check global python version
+      raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv global"
+      register: global_python_version
+      changed_when: False
+
+    - name: Set global python version
+      raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv global system"
+      when: not global_python_version.stdout | lower is search("system")
+  when: python.global_version is defined and python.global_version | lower == 'system'
+
+- include_tasks: install-direnv.yml
+  when: install_direnv | bool
 
 - include_tasks: configure-shell.yml
   when: init_shell | bool

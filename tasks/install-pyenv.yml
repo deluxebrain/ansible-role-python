@@ -1,20 +1,23 @@
 ---
 - name: Debug pyenv version
   debug:
-    msg: "Version of pyenv to install: {{ pyenv_reference }}"
+    msg: "Version of pyenv to install: {{ pyenv.version }}"
 
 - name: Install pyenv
   git:
-    repo: "{{ pyenv_repo }}"
-    dest: "{{ pyenv_root }}"
-    version: "{{ pyenv_reference }}"
+    repo: "{{ pyenv.repo }}"
+    dest: "{{ pyenv.path }}"
+    version: "{{ pyenv.version }}"
 
-- name: Debug pyenv-virtualenv version
-  debug:
-    msg: "Version of pyenv-virtualenv to install: {{ pyenvvirtualenv_reference }}"
+- name: Create .pyenvrc file
+  template:
+    src: pyenvrc.j2
+    dest: "{{ ansible_env.HOME }}/.pyenvrc"
+    mode: 0644
 
-- name: Install pyenv-virtualenv
-  git:
-    repo: "{{ pyenvvirtualenv_repo }}"
-    dest: "{{ pyenv_root }}/plugins/pyenv-virtualenv"
-    version: "{{ pyenvvirtualenv_reference }}"
+- name: Create .condarc file
+  template:
+    src: condarc.j2
+    dest: "{{ ansible_env.HOME }}/.condarc"
+    mode: 0644
+  when: python_versions | select('search', 'conda') | list
