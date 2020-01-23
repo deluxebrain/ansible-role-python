@@ -19,7 +19,8 @@ $(VENV):
 install: venv $(SITE_PACKAGES)
 $(SITE_PACKAGES): requirements.txt
 	$(VENV_ACTIVATE); \
-	pip3 install -r requirements.txt
+	pip3 install -r requirements.txt; \
+	touch $@
 
 lint:
 	yamllint .
@@ -29,7 +30,7 @@ converge: install
 	$(VENV_ACTIVATE); \
 	molecule converge
 
-run: $(RUN)
+run: install $(RUN)
 $(RUN):
 	$(VENV_ACTIVATE); \
 	molecule converge
@@ -55,6 +56,10 @@ $(TEST_TARGETS): export MOLECULE_DISTRO = $(subst _,:,$(subst test-,,$@))
 $(TEST_TARGETS):
 	$(VENV_ACTIVATE); \
 	molecule test
+
+freeze: venv
+	$(VENV_ACTIVATE); \
+	pip freeze > requirements.txt
 
 clean: install
 	$(VENV_ACTIVATE); \
