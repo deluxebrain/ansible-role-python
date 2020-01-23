@@ -44,12 +44,14 @@
 - name: Set global python version
   block:
     - name: Check global python version
-      raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv global"
+      shell: "PYENV_ROOT={{ pyenv.path }} \
+        {{ pyenv.path }}/bin/pyenv global" # noqa 305
       register: global_python_version
       changed_when: False
 
     - name: Set global python version
-      raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv global system"
+      shell: "PYENV_ROOT={{ pyenv.path }} \
+        {{ pyenv.path }}/bin/pyenv global system" # noqa 305
       when: not global_python_version.stdout | lower is search("system")
   when: python.global_version is defined and python.global_version | lower == 'system'
 

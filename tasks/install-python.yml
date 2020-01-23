@@ -5,6 +5,7 @@
   register: python_exists
 
 - name: Install python {{ item }}
-  raw: "PYENV_ROOT={{ pyenv.path }} {{ pyenv.path }}/bin/pyenv install {{ item }}"
+  shell: "PYENV_ROOT={{ pyenv.path }} \
+    {{ pyenv.path }}/bin/pyenv install {{ item }}" # noqa 305
   notify: rehash
   when: python_exists.stat is defined and not python_exists.stat.exists
