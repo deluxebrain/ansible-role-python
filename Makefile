@@ -3,7 +3,7 @@
 VENV_NAME := .venv
 VENV := $(VENV_NAME)/.timestamp
 VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
-SITE_PACKAGES := $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
+SITE_PACKAGES = $(shell test -d $(VENV_NAME) && $(VENV_ACTIVATE); \
 	pip3 show pip | grep ^Location | cut -d':' -f2)
 DISTROS := ubuntu_18.04 \
 	ubuntu_19.04
@@ -16,11 +16,11 @@ $(VENV):
 	python3 -m venv $(VENV_NAME)
 	touch $@
 
-install: venv $(SITE_PACKAGES)
-$(SITE_PACKAGES): requirements.txt
+install: $(SITE_PACKAGES)
+$(SITE_PACKAGES): $(VENV) requirements.txt
 	$(VENV_ACTIVATE); \
 	pip3 install -r requirements.txt; \
-	touch $@
+	touch $(SITE_PACKAGES)
 
 lint:
 	yamllint .
