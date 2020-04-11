@@ -1,0 +1,37 @@
+---
+- name: Verify
+  hosts: all
+  # NB: Role variables are not available during molecule test ( redeclare here )
+  vars:
+    pyenv:
+      path: "{{ ansible_env.HOME }}/.pyenv"
+  tasks:
+    - name: "Verify pyenv is installed"
+      shell: "PYENV_ROOT={{ pyenv.path }} \
+        {{ pyenv.path }}/bin/pyenv --version"
+      register: pyenv_version_command
+
+    - assert:
+        that: "pyenv_version_command.rc == 0"
+        fail_msg: "Pyenv is not installed"
+        success_msg: "Pyenv is installed"
+
+    - name: "Verify python 3.8.1 is installed"
+      shell: "PYENV_ROOT={{ pyenv.path }} \
+        {{ pyenv.path }}/bin/pyenv versions"
+      register: pyenv_versions_command
+
+    - assert:
+        that: "'3.8.1' in pyenv_versions_command.stdout"
+        fail_msg: "Python 3.8.1 is not installed"
+        success_msg: "Python 3.8.1 is installed"
+
+    - name: "Verify global python is set to 3.8.1"
+      shell: "PYENV_ROOT={{ pyenv.path }} \
+        {{ pyenv.path }}/bin/pyenv global"
+      register: pyenv_global_command
+
+    - assert:
+        that: "'3.8.1' in pyenv_global_command.stdout"
+        fail_msg: "Global python not set to 3.8.1"
+        success_msg: "Global python set to 3.8.1"

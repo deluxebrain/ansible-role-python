@@ -2,6 +2,8 @@
 # Based on ansible-lint config
 extends: default
 
+ignore: .venv
+
 rules:
   braces:
     max-spaces-inside: 1
@@ -31,5 +33,3 @@ rules:
     type: unix
   trailing-spaces: disable
   truthy: disable
-
-ignore: .venv

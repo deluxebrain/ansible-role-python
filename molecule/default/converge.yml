@@ -1,0 +1,19 @@
+---
+- name: Converge
+  hosts: all
+
+  pre_tasks:
+    - name: "Update apt cache"
+      apt: update_cache=true cache_valid_time=600
+      when: ansible_os_family | lower == 'debian'
+
+  tasks:
+    - name: "Include ansible-role-python"
+      include_role:
+        name: "ansible-role-python"
+      vars:
+        python_versions:
+          - 3.8.1
+        global_python_version: 3.8.1
+        pip_packages:
+          - azure-cli

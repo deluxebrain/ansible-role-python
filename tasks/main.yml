@@ -25,11 +25,11 @@
 
 - include_tasks: install-pyenv.yml
 
-- name: Install plugins
+- name: Install pyenv plugins
   block:
     - name: Form merged list of plugins
       set_fact:
-        merged_plugins: "{{ default_plugins | union(plugins) }}"
+        merged_plugins: "{{ default_pyenv_plugins | union(pyenv_plugins) }}"
 
     - name: Install plugin {{ item.name }}
       include: install-plugins.yml
@@ -39,21 +39,21 @@
 - name: Install python versions
   include: install-python.yml
   with_items:
-    - "{{ python.versions }}"
+    - "{{ python_versions }}"
 
 - name: Set global python version
   block:
     - name: Check global python version
       shell: "PYENV_ROOT={{ pyenv.path }} \
         {{ pyenv.path }}/bin/pyenv global" # noqa 305
-      register: global_python_version
+      register: current_global_python_version
       changed_when: False
 
     - name: Set global python version
       shell: "PYENV_ROOT={{ pyenv.path }} \
-        {{ pyenv.path }}/bin/pyenv global system" # noqa 305
-      when: not global_python_version.stdout | lower is search("system")
-  when: python.global_version is defined and python.global_version | lower == 'system'
+        {{ pyenv.path }}/bin/pyenv global {{ global_python_version }}" # noqa 305
+      when: current_global_python_version.stdout != global_python_version
+  when: global_python_version is defined and global_python_version in python_versions
 
 - include_tasks: install-direnv.yml
   when: install_direnv | bool

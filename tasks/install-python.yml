@@ -1,11 +1,16 @@
 ---
+- name: Debug python version to install
+  debug:
+    msg: "Request to insall python version: {{ item }}"
+
 - name: Check for python {{ item }}
   stat:
     path: "{{ pyenv.path }}/versions/{{ item }}"
   register: python_exists
 
 - name: Install python {{ item }}
+  # noqa 305
   shell: "PYENV_ROOT={{ pyenv.path }} \
-    {{ pyenv.path }}/bin/pyenv install {{ item }}" # noqa 305
+    {{ pyenv.path }}/bin/pyenv install {{ item }}"
   notify: rehash
   when: python_exists.stat is defined and not python_exists.stat.exists

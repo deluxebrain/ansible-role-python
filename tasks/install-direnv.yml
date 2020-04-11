@@ -13,7 +13,7 @@
     content: ""
     dest: "{{ ansible_env.HOME }}/.direnvrc"
     force: no
-    mode: 0644
+    mode: "0644"
 
 - name: Populate direnvrc file
   blockinfile:

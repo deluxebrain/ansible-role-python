@@ -5,7 +5,7 @@ pyenv:
   version: >-
     {{ (pyenv_version == 'latest') | ternary('HEAD', 'v' + pyenv_version) }}
 
-default_plugins:
+default_pyenv_plugins:
   - name: pyenv-virtualenv
     repo: https://github.com/pyenv/pyenv-virtualenv.git
     version: "{{ pyenvvirtualenv_version }}"

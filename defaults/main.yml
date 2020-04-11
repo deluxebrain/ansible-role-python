@@ -1,10 +1,14 @@
 ---
 pyenv_version: latest
+pyenv_plugins: []
+
 pyenvvirtualenv_version: latest
+
 install_direnv: yes
-python:
-  global_version: ""
-  versions: []
-plugins: []
+
+python_versions: []
+global_python_version: ""
+
 pip_packages: []
+
 init_shell: yes
