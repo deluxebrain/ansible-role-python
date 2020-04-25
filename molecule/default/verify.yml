@@ -8,6 +8,7 @@
   vars:
     pyenv:
       path: "{{ ansible_env.HOME }}/.pyenv"
+
   tasks:
     - name: "Verify pyenv is installed"
       shell: "PYENV_ROOT={{ pyenv.path }} \
