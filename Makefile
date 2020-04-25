@@ -2,8 +2,8 @@
 .PHONY: install venv dev-install compile sync clean run connect lint test test-all
 
 export MOLECULE_INSTANCE := ansible-role-python
-MOLECULE_DISTROS := ubuntu-18.04 \
-	ubuntu-19.04
+MOLECULE_DISTROS := ubuntu-18.04 # \
+	# ubuntu-20.04
 
 VENV_NAME := .venv
 VENV_TIMESTAMP := $(VENV_NAME)/.timestamp
