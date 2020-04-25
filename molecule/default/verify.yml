@@ -1,7 +1,8 @@
 ---
 - name: Verify
   hosts: all
-  # NB: Role variables are not available during molecule test ( redeclare here )
+  # Note: Role variables are not available during molecule test
+  # Therefore must redeclare here
   vars:
     pyenv:
       path: "{{ ansible_env.HOME }}/.pyenv"

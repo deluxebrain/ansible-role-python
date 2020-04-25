@@ -19,7 +19,7 @@ $(VENV_TIMESTAMP):
 	python3 -m venv $(VENV_TIMESTAMP)
 	touch $@
 
-## Install development packages
+## Install development packages into virtual environment
 install: venv $(DEV_INSTALLED)
 $(DEV_INSTALLED): requirements-dev.txt
 	$(VENV_ACTIVATE); \
@@ -39,19 +39,18 @@ sync: compile
 	$(VENV_ACTIVATE); \
 	pip-sync
 
-## Tear down all molecule containers
-clean: install
-	$(VENV_ACTIVATE); \
-	molecule destroy
-	rm -f $(RUN);
-
-run: install
+run: sync
 	$(VENV_ACTIVATE); \
 	molecule converge
 
-connect: install
+connect: sync
 	$(VENV_ACTIVATE); \
 	molecule login
+
+clean: sync
+	$(VENV_ACTIVATE); \
+	molecule destroy
+	rm -f $(RUN);
 
 # Test targets
 
