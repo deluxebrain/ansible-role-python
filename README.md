@@ -107,14 +107,6 @@ Note that this means that the `requirements.txt` file *should not be manually ed
 make sync
 ```
 
-### Selected make targets
-
-The following make targets relate to the development envrironment and process:
-
-- `install`: create virtual environment and install development dependencies
-- `compile`: reconcile requirements.txt file against any changes to the requirements.in file
-- `sync`: reconcile the virtual environment against any changes to the requirements.txt file
-
 ## Role usage
 
 The following is an overview of the components installed and managed through the role.
