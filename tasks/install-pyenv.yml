@@ -1,23 +1,23 @@
 ---
-- name: Debug pyenv version
+- name: "Debug pyenv version"
   debug:
     msg: "Version of pyenv to install: {{ pyenv.version }}"
 
-- name: Install pyenv
+- name: "Install pyenv"
   git:
     repo: "{{ pyenv.repo }}"
     dest: "{{ pyenv.path }}"
     version: "{{ pyenv.version }}"
 
-- name: Create .pyenvrc file
+- name: "Create .pyenvrc file"
   template:
     src: pyenvrc.j2
     dest: "{{ ansible_env.HOME }}/.pyenvrc"
-    mode: 0644
+    mode: "0644"
 
-- name: Create .condarc file
+- name: "Create .condarc file"
   template:
     src: condarc.j2
     dest: "{{ ansible_env.HOME }}/.condarc"
-    mode: 0644
+    mode: "0644"
   when: python_versions | select('search', 'conda') | list

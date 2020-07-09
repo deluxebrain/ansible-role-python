@@ -1,5 +1,5 @@
 ---
-- name: Install system python
+- name: "Install system python"
   become: yes
   package:
     name: "{{ item }}"
@@ -9,15 +9,15 @@
   until: result is succeeded
   with_items: "{{ system_python_packages }}"
 
-- name: Form merged list of pip packages
+- name: "Form merged list of pip packages"
   set_fact:
     merged_pip_packages: "{{ default_pip_packages | union(pip_packages) }}"
 
-- name: Show merged pip packages
+- name: "Show merged pip packages"
   debug:
     var: merged_pip_packages
 
-- name: Install pip packages into system python
+- name: "Install pip packages into system python"
   pip:
     name: "{{ merged_pip_packages }}"
     extra_args: --user

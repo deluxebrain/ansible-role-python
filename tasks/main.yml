@@ -1,17 +1,17 @@
 ---
-- name: Load variables for the target system
+- name: "Load variables for the target system"
   include_vars: "{{ item }}"
   with_first_found:
     - "{{ ansible_os_family | lower }}.yml"
     - default.yml
 
-- name: Set apt to use https
+- name: "Set apt to use https"
   become: yes
   apt:
     name: apt-transport-https
     state: present
 
-- name: Install system dependencies
+- name: "Install system dependencies"
   become: yes
   package:
     name: "{{ item }}"
@@ -25,31 +25,31 @@
 
 - include_tasks: install-pyenv.yml
 
-- name: Install pyenv plugins
+- name: "Install pyenv plugins"
   block:
-    - name: Form merged list of plugins
+    - name: "Form merged list of plugins"
       set_fact:
         merged_plugins: "{{ default_pyenv_plugins | union(pyenv_plugins) }}"
 
-    - name: Install plugin {{ item.name }}
+    - name: "Install plugin {{ item.name }}"
       include: install-plugins.yml
       with_items: "{{ merged_plugins }}"
       when: merged_plugins | length > 0
 
-- name: Install python versions
+- name: "Install python versions"
   include: install-python.yml
   with_items:
     - "{{ python_versions }}"
 
-- name: Set global python version
+- name: "Set global python version"
   block:
-    - name: Check global python version
+    - name: "Check global python version"
       shell: "PYENV_ROOT={{ pyenv.path }} \
         {{ pyenv.path }}/bin/pyenv global" # noqa 305
       register: current_global_python_version
       changed_when: False
 
-    - name: Set global python version
+    - name: "Set global python version"
       shell: "PYENV_ROOT={{ pyenv.path }} \
         {{ pyenv.path }}/bin/pyenv global {{ global_python_version }}" # noqa 305
       when: current_global_python_version.stdout != global_python_version

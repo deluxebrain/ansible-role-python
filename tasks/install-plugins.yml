@@ -1,14 +1,14 @@
 ---
-- name: Form {{ item.name }} version
+- name: "Form {{ item.name }} version"
   set_fact:
     plugin_version: >-
       {{ (item.version == 'latest') | ternary('HEAD', item.version) }}
 
-- name: Debug {{ item.name }} version
+- name: "Debug {{ item.name }} version"
   debug:
     msg: "Version of {{ item.name }} to install: {{ plugin_version }}"
 
-- name: Install {{ item.name }}
+- name: "Install {{ item.name }}"
   git:
     repo: "{{ item.repo }}"
     dest: "{{ pyenv.path }}/plugins/{{ item.name }}"

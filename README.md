@@ -2,13 +2,14 @@
 
 [![Build Status](https://travis-ci.org/deluxebrain/ansible-role-python.svg?branch=master)](https://travis-ci.org/deluxebrain/ansible-role-python)
 
-Python installer for Linux.
+Python installer for Linux utilizing `pyenv`.
 
-The following Python usage scenarios are supported:
+Virtual environment management is native to python for python 3.3 and above.
+This drives the following python usage scenarios:
 
-- Single Python version using the latest operating system Python package version >= 3.3
-- Mutliple Python versions >= 3.3 using `pyenv` and the `venv` Python module
-- Multiple Python versions ( any version ) using `pyenv` and the `pyenv-virtualenv` plugin
+- Single python version using the latest operating system python package version >= 3.3
+- Mutliple python versions >= 3.3 using `pyenv` and the `venv` python module
+- Multiple python versions ( any version ) using `pyenv` and the `pyenv-virtualenv` plugin
 
 ## Requirements
 
@@ -26,36 +27,19 @@ Individual variables can be set or overridden by setting them in a playbook for 
 - `install_direnv`: ( default: yes )
   - Install `direnv` to help manage loading of virtual environments
 - `global_python_version`: ( default: "" )
-  - Configure `pyenv` to use the specified version of Python by default
+  - Configure `pyenv` to use the specified version of python by default
   - Must be one of the versions specified in `python_versions`
 - `python_versions`: ( default: [] )
-  - List of Python versions to install
+  - List of python versions to install
 - `pyenv_plugins`: ( default: [] )
   - List of plugins to install, specified as a list of:
     - `name`: plugin name
     - `repo`: plugin github repository
     - `version`: plugin version, specify "latest" for HEAD
 - `pip_packages`: ( default: [] )
-  - Pip packages to install for the user into the system Python
+  - Pip packages to install for the user into the system python
 - `init_shell`: ( default: yes )
   - Configure shell to load pyenv and pyenv-virtualenv
-
-### Global Python
-
-`pyenv` will use the version of Python specified by the `pyenv global` command as the default Python version.
-
-The default system Python version is used when no explicit Python version is specified as part of this command.
-
-In this case`pyenv` resolves the system Python as the version that responds to the `python` command.
-This causes issues on systems where Python2 is not installed ( and hence the `python` command not available ),
-regardless of whether Python3 is installed.
-
-Therefore `pyenv global` should only be set to use the system Python when Python2 is installed.
-
-In the case where Python3 is also installed, `pyenv` does not affect the `python3` command and hence
-this will be available globally using the `python3` command as per usual.
-
-As this role does not install Python2, only Python versions installed via `pyenv` should be set as global.
 
 ## Dependencies
 
@@ -85,11 +69,9 @@ Example below for the following:
 
 ## Development Installation
 
-The included files, `requirements-dev.txt` and `requirements.txt` install development and production dependencies accordingly.
+Packages are split into development and production dependencies, which are managed through the included files `requirements-dev.txt` and `requirements.txt` respectively.
 
-The included Makefile includes several targets related to the installation of the development environment and the management of the development process.
-
-Packages are managed through the `pip-tools` suite. This, and other development requirements, are installed through the `requirements-dev.txt` file.
+Production packages are managed through the `pip-tools` suite, which installs and synchronizes the project dependencies through the included `requirements.in` file.
 
 ```sh
 # Create project virtual environment
@@ -97,9 +79,9 @@ Packages are managed through the `pip-tools` suite. This, and other development 
 make install
 ```
 
-`pip-tools` manages the project dependencies through the included `requirements.in` file, and is responsible both for the generation of the `requirements.txt` file and package installion into the virtual environment.
+`pip-tools` is responsible for the generation of the `requirements.txt` which is a fully pinned requirements file used for both synchronizing the Python virtual environment and for the installation of packages within a production environment.
 
-Note that this means that the `requirements.txt` file *should not be manually edited* and must be regenerated every time the `requirements.in` file is changed.
+Note that this means that the `requirements.txt` file *should not be manually edited* and must be regenerated every time the `requirements.in` file is changed. This is done as follows, which also synchronizes any package changes into the virtual environment:
 
 ```sh
 # Compile the requirements.in file to requirements.txt
@@ -107,15 +89,17 @@ Note that this means that the `requirements.txt` file *should not be manually ed
 make sync
 ```
 
+`pip-tools` and other development requirements are installed through the `requirements-dev.txt` file, as follows:
+
 ## Role usage
 
-The following is an overview of the components installed and managed through the role.
+The following is an overview of the usage of the components installed and managed through the role.
 
-### `venv`
+### Using system python alongside `venv`
 
-`venv` is included from Python 3.3+ and should be used in preference to the deprecated `pyvenv` script.
+`venv` is included from python 3.3+ and should be used in preference to the deprecated `pyvenv` script.
 
-Its use with the system Python is demonstrated in the following example:
+Its use with the system python is demonstrated in the following example:
 
 ```sh
 # Create project directory
@@ -132,41 +116,32 @@ $ source .venv/bin/activate
 deactivate
 ```
 
-### `pyenv`
+### Using `pyenv` to manage multiple python versions >= 3.3
 
-`pyenv` allows you to use multiple Python versions on your machine whilst maintaining the consistency of the system Python.
+`pyenv` allows you to use multiple python versions on your machine whilst maintaining the integrity of the system python.
 
-Its use for using a specific Python version >= 3.3 is demonstrated in the following example:
+Its use for using a specific python version >= 3.3 is demonstrated in the following example:
 
 ```sh
-# Install specific Python version
+# Install specific python version
 pyenv install 3.7.0
 
 # Create project directory
 mkdir ~/my-project && cd $_
 
-# Configure the project to use specific Python version
+# Configure the project to use specific python version
 pyenv local 3.7.0   # creates .python-version
 
 # Create virtual environment in the .venv directory
 python -m venv .venv
 ```
 
-#### `pyenv` and recreating the project using system Python
+### Using pyenv and pyenv-virtualenv to manage multiple python installations of any version
 
-The use of `pyenv` when recreating a project to use system Python is demonstrated in the following example:
+`pyenv-virtualenv` is a plugin for `pyenv` that allows virtual environment creation across all python versions
+inluding `conda`.
 
-```sh
-cd ~/my-project
-
-# Create virtual environment in the .venv directory
-python3.7 -m venv .venv
-```
-
-### `pyenv-virtualenv`
-
-`pyenv-virtualenv` is a plugin for `pyenv` that allows virtual environment creation across all Python versions
-inluding `conda`. Contrast this to `venv`, which although should be used in preference only supports Python >= 3.3
+Contrast this to `venv`, which although should be used in preference only supports python >= 3.3
 
 Its use is demonstrated in the following example:
 
@@ -190,10 +165,26 @@ pyenv activate venv
 pyenv deactivate
 ```
 
-### `pip`
+### Global Python
 
-Per-project `pip` packages should be installed into a virtual environment
-and specified in a `requirements.txt` file.
+`pyenv` will use the version of python specified by the `pyenv global` command as the default python version for the `python` command.
+
+The default system python version is used when no explicit python version is specified as part of this command.
+
+In this case`pyenv` resolves the system python as the version that responds to the `python` command.
+This causes issues on systems where python2 is not installed ( and hence the `python` command not available ),
+regardless of whether python3 is installed.
+
+Therefore `pyenv global` should only be set to use the system python when python2 is installed.
+
+In the case where python3 is also installed, `pyenv` does not affect the `python3` command and hence
+this will be available globally using the `python3` command as per usual.
+
+As this role does not install python2, only python versions installed via `pyenv` should be set as global.
+
+## Python Package Management
+
+Per-project `pip` packages should be installed into a virtual environment and specified in a `requirements.txt` file.
 
 Its use for adding new packages is demonstrated in the following example:
 
@@ -211,9 +202,24 @@ pip install 'foo>=1.0.0,<1.1.0'   # range
 pip freeze > requirements.txt
 ```
 
-#### `pip` and recreating the project
+## Development Workflows
 
-The use of `pip` when recreating a project is demonstrated in the following example:
+### Deploying `pyenv` managed projects into system python
+
+Recreating a `pyenv` managed project to use system python.
+Assumes the project is using python3.7 and hence a system python of version 3.7.
+
+```sh
+cd ~/my-project
+
+# Create virtual environment in the .venv directory
+python3.7 -m venv .venv
+```
+
+### Deploying `pip` managed dependencies into system pythong
+
+Recreating a project with `pip` managed dependencies.
+Assumes the project is using python3.7 and hence a system python of version 3.7.
 
 ```sh
 # Create virtual environment in the .venv directory
@@ -227,13 +233,15 @@ $ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+## Other Tooling
+
 ### `direnv`
 
 `direnv` is optionally installed to create and manage virtual environments.
 
-#### `direnv` and `venv` with system Python
+#### `direnv` and `venv` with system python
 
-The use of `direnv` with `venv` with system Python is demonstrated in the following example:
+The use of `direnv` with `venv` with system python is demonstrated in the following example:
 
 ```sh
 # Create project directory

@@ -12,4 +12,4 @@
 .vscode
 
 # Makefile related
-.*_timestamp
+.timestamp

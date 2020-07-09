@@ -1,14 +1,14 @@
 ---
-- name: Debug python version to install
+- name: "Debug python version to install"
   debug:
     msg: "Request to insall python version: {{ item }}"
 
-- name: Check for python {{ item }}
+- name: "Check for python {{ item }}"
   stat:
     path: "{{ pyenv.path }}/versions/{{ item }}"
   register: python_exists
 
-- name: Install python {{ item }}
+- name: "Install python {{ item }}"
   # noqa 305
   shell: "PYENV_ROOT={{ pyenv.path }} \
     {{ pyenv.path }}/bin/pyenv install {{ item }}"

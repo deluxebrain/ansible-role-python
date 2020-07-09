@@ -1,8 +1,8 @@
 ---
-pyenv_version: latest
+pyenv_version: "latest"
 pyenv_plugins: []
 
-pyenvvirtualenv_version: latest
+pyenvvirtualenv_version: "latest"
 
 install_direnv: yes
 

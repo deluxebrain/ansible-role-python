@@ -1,72 +1,80 @@
 .DEFAULT_GOAL := lint
-.PHONY: install venv dev-install compile sync clean run connect lint test test-all
 
-export MOLECULE_INSTANCE := ansible-role-python
-MOLECULE_DISTROS := ubuntu-18.04 # \
-	# ubuntu-20.04
-
+export MOLECULE_INSTANCE_NAME := ansible-role-python
+DEFAULT_MOLECULE_DISTRO := ubuntu-20.04
+MOLECULE_DISTROS := ubuntu-18.04 ubuntu-20.04
 VENV_NAME := .venv
-VENV_TIMESTAMP := $(VENV_NAME)/.timestamp
-VENV_ACTIVATE :=. $(VENV_NAME)/bin/activate
-DEV_INSTALLED = $(shell $(VENV_ACTIVATE); pip3 show pip | grep ^Location | cut -d':' -f2)
-TEST_TARGETS := $(addprefix test-,$(MOLECULE_DISTROS))
+INSTALL_TIMESTAMP := $(VENV_NAME)/.timestamp
 
 # Install targets
 
+## Remove virtual environment
+clean:
+	if [ -d $(VENV_NAME) ]; then \
+		command -v molecule && molecule destroy; \
+		rm -rf $(VENV_NAME); \
+	fi
+
 ## Create virtual environment
-venv: $(VENV_TIMESTAMP)
-$(VENV_TIMESTAMP):
-	python3 -m venv $(VENV_TIMESTAMP)
-	touch $@
+venv: $(VENV_NAME)
+$(VENV_NAME):
+	python3 -m venv $(VENV_NAME)
 
 ## Install development packages into virtual environment
-install: venv $(DEV_INSTALLED)
-$(DEV_INSTALLED): requirements-dev.txt
-	$(VENV_ACTIVATE); \
+install: venv $(INSTALL_TIMESTAMP)
+$(INSTALL_TIMESTAMP): requirements-dev.txt
+	. $(VENV_NAME)/bin/activate; \
 	pip3 install -r requirements-dev.txt
-	touch $@
+	@touch $@
 
 # Development targets
+
+## Run ansible linters
+lint: sync
+	. $(VENV_NAME)/bin/activate; \
+	molecule lint
 
 ## Compile requirements.txt from requirements.in
 compile: requirements.txt install
 requirements.txt: requirements.in
-	$(VENV_ACTIVATE); \
+	. $(VENV_NAME)/bin/activate; \
 	pip-compile --generate-hashes requirements.in
 
 ## Sync virtual environment packages with requirements
 sync: compile
-	$(VENV_ACTIVATE); \
+	. $(VENV_NAME)/bin/activate; \
 	pip-sync
 
-run: sync
-	$(VENV_ACTIVATE); \
+# Molecule targets
+
+## Converge Ansible role
+run: export MOLECULE_DISTRO := $(subst -,:,$(DEFAULT_MOLECULE_DISTRO))
+run: sync molecule
+	@echo "Running for distro: $(MOLECULE_DISTRO)"
+	. $(VENV_NAME)/bin/activate; \
 	molecule converge
 
-connect: sync
-	$(VENV_ACTIVATE); \
+## Connect to molecule docker container
+connect: run
+	. $(VENV_NAME)/bin/activate; \
 	molecule login
-
-clean: sync
-	$(VENV_ACTIVATE); \
-	molecule destroy
-	rm -f $(RUN);
 
 # Test targets
 
-## Run ansible linters
-lint: install
-	$(VENV_ACTIVATE); \
-	molecule lint
-
 ## Run tests against default distro
-test: clean
-	$(VENV_ACTIVATE); \
+test: export MOLECULE_DISTRO := $(subst -,:,$(DEFAULT_MOLECULE_DISTRO))
+test: clean sync
+	@echo "Running for distro: $(MOLECULE_DISTRO)"
+	. $(VENV_NAME)/bin/activate; \
 	molecule test
 
 ## Run tests against all distros
-test-all: clean $(TEST_TARGETS)
-$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst -,:,$(subst test-,,$@))
-$(TEST_TARGETS):
-	$(VENV_ACTIVATE); \
+TEST_TARGETS := $(addprefix .test-,$(MOLECULE_DISTROS))
+test-all: $(TEST_TARGETS)
+$(TEST_TARGETS): export MOLECULE_DISTRO = $(subst -,:,$(subst .test-,,$@))
+$(TEST_TARGETS): clean sync
+	@echo "Running for distro: $(MOLECULE_DISTRO)"
+	. $(VENV_NAME)/bin/activate; \
 	molecule test
+
+.PHONY: clean venv install lint compile sync run connect test test-all

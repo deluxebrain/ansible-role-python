@@ -1,6 +1,6 @@
 ---
 pyenv:
-  repo: https://github.com/pyenv/pyenv.git
+  repo: "https://github.com/pyenv/pyenv.git"
   path: "{{ ansible_env.HOME }}/.pyenv"
   version: >-
     {{ (pyenv_version == 'latest') | ternary('HEAD', 'v' + pyenv_version) }}

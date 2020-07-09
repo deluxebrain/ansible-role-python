@@ -1,31 +1,31 @@
 ---
-- name: Resolve .bashrc path
+- name: "Resolve .bashrc path"
   block:
-    - name: Set path to .bashrc
+    - name: "Set path to .bashrc"
       set_fact:
         bashrc_path: "{{ ansible_env.HOME }}/.bashrc"
       when: bashrc_path is undefined
 
-    - name: Check .bashrc file exists
+    - name: "Check .bashrc file exists"
       stat:
         path: "{{ bashrc_path }}"
       register: bashrc_path_stat
 
-    - name: Resolve .bashrc symlink
+    - name: "Resolve .bashrc symlink"
       set_fact:
         bashrc_path: "{{ bashrc_path_stat.stat.lnk_source }}"
       when: bashrc_path_stat.stat.exists and bashrc_path_stat.stat.islnk
 
-- name: Load pyenv in .bashrc
+- name: "Load pyenv in .bashrc"
   block:
-    - name: Check whether pyenvrc is loaded in the .bashrc file
+    - name: "Check whether pyenvrc is loaded in the .bashrc file"
       command: "grep -Fq 'source $HOME/.pyenvrc' {{ bashrc_path }}"
       register: check_bashrc
       ignore_errors: yes
       changed_when: no
       failed_when: no
 
-    - name: Add .pyenvrc to .bashrc
+    - name: "Add .pyenvrc to .bashrc"
       blockinfile:
         dest: "{{ bashrc_path }}"
         marker: "# {mark} ANSIBLE MANAGED BLOCK: pyenv"
@@ -36,16 +36,16 @@
       when: check_bashrc.rc != 0
   when: bashrc_path_stat.stat.exists
 
-- name: Load direnv in .bashrc
+- name: "Load direnv in .bashrc"
   block:
-    - name: Check whether direnv is loaded in the .bashrc file
+    - name: "Check whether direnv is loaded in the .bashrc file"
       command: "grep -Fq 'direnv hook bash' {{ bashrc_path }}"
       register: check_bashrc
       ignore_errors: yes
       changed_when: no
       failed_when: no
 
-    - name: Add direnv to .bashrc
+    - name: "Add direnv to .bashrc"
       blockinfile:
         dest: "{{ bashrc_path }}"
         marker: "# {mark} ANSIBLE MANAGED BLOCK: direnv"
