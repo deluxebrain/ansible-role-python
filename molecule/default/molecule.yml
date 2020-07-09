@@ -12,7 +12,7 @@ lint: |
 
 platforms:
   - name: ${MOLECULE_INSTANCE_NAME:-molecule-instance}
-    image: ${MOLECULE_DISTRO:-ubuntu:18.04}
+    image: ${MOLECULE_DISTRO:-ubuntu:20.04}
     pre_build_image: false
 
 provisioner:
