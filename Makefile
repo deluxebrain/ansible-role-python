@@ -2,7 +2,7 @@
 
 export MOLECULE_INSTANCE_NAME := ansible-role-python
 DEFAULT_MOLECULE_DISTRO := ubuntu-20.04
-MOLECULE_DISTROS := ubuntu-18.04 ubuntu-20.04
+MOLECULE_DISTROS := ubuntu-18.04 ubuntu-20.04 debian-10
 VENV_NAME := .venv
 INSTALL_TIMESTAMP := $(VENV_NAME)/.timestamp
 

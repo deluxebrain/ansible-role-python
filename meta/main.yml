@@ -11,6 +11,9 @@ galaxy_info:
       versions:
         - 18.04
         - 20.04
+    - name: Debian
+      versions:
+        - 10
 
   galaxy_tags:
     - python
