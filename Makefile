@@ -35,7 +35,7 @@ lint: sync
 	molecule lint
 
 ## Compile requirements.txt from requirements.in
-compile: requirements.txt install
+compile: install requirements.txt
 requirements.txt: requirements.in
 	. $(VENV_NAME)/bin/activate; \
 	pip-compile --generate-hashes requirements.in
@@ -55,7 +55,7 @@ run: sync molecule
 	molecule converge
 
 ## Connect to molecule docker container
-connect: run
+connect: sync
 	. $(VENV_NAME)/bin/activate; \
 	molecule login
 
